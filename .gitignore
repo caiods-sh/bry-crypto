@@ -1,3 +1,4 @@
 /bin
 /build
 CMakeUserPresets.json
+*.p7s

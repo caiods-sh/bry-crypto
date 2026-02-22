@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "crypto/hash.hpp"
+#include "crypto/Hash.hpp"
 #include <fstream>
 #include <filesystem>
 

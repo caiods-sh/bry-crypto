@@ -1,4 +1,4 @@
-#include "hash.hpp"
+#include "Hash.hpp"
 #include <openssl/evp.h>
 #include <fstream>
 #include <iomanip>
