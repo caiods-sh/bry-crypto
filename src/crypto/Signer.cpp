@@ -21,7 +21,7 @@ void Signer::signFileToP7s(const std::string& inputFilePath,
                            const std::string& pkcs12Password,
                            const std::string& outputP7sPath
     ) {
-    // 1 - Primeiramente chamo a outra lib que processa o arquivo Pkcs12,
+    // 1 - Primeiramente chamo a outra classe que processa o arquivo Pkcs12,
     //     retornando a chave privada e o certificado.
     Pkcs12Data pkcs12 = Pkcs12Loader::loadFromFile(pkcs12Path, pkcs12Password);
 
@@ -42,18 +42,24 @@ void Signer::signFileToP7s(const std::string& inputFilePath,
 
 
     // 3 - Em seguida crio o CMS (attached, SHA-512, RSA)
-    int flags = CMS_BINARY;
-    CMS_ContentInfo* cms = CMS_sign(
-        pkcs12.certificate.get(),
-        pkcs12.privateKey.get(),
-        nullptr,
-        dataBio,
-        flags
-    );
+    int flags = CMS_BINARY | CMS_PARTIAL;
+    CMS_ContentInfo* cms = CMS_sign(nullptr, nullptr, nullptr, dataBio, flags);
 
     if (!cms) {
         BIO_free(dataBio);
-        throwLastOpenSslError("Error creating CMS signature");
+        throwLastOpenSslError("Error creating CMS structure");
+    }
+
+    if (!CMS_add1_signer(cms, pkcs12.certificate.get(), pkcs12.privateKey.get(), EVP_sha512(), flags)) {
+        CMS_ContentInfo_free(cms);
+        BIO_free(dataBio);
+        throwLastOpenSslError("Error adding signer with SHA-512");
+    }
+
+    if (!CMS_final(cms, dataBio, nullptr, flags)) {
+        CMS_ContentInfo_free(cms);
+        BIO_free(dataBio);
+        throwLastOpenSslError("Error finalizing CMS signature");
     }
 
 

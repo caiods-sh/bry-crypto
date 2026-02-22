@@ -1,6 +1,7 @@
 add_library(crypto_lib STATIC 
     crypto/Hash.cpp
     crypto/Pkcs12Loader.cpp
+    crypto/Verifier.cpp
     crypto/Signer.cpp
 )
 
@@ -29,6 +30,15 @@ target_link_libraries(
 add_executable(bry_challenge_two ch2.cpp)
 target_link_libraries(
     bry_challenge_two
+    PRIVATE
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        crypto_lib
+)
+
+add_executable(bry_challenge_tree ch3.cpp)
+target_link_libraries(
+    bry_challenge_tree
     PRIVATE
         OpenSSL::SSL
         OpenSSL::Crypto
