@@ -2,8 +2,8 @@ PROJECT_DIR ?= /home/vboxuser/softwares/bry# Alterar para diretório que o proje
 BUILD_DIR = $(PROJECT_DIR)/build/build/Release
 
 DOC_DIR ?= $(PROJECT_DIR)/resources/arquivos/doc.txt
-P12_FILE_DIR = $(PROJECT_DIR)/resources/pkcs12/cert_unit_test.pfx
-P12_PASSWORD ?= devc++
+P12_FILE_DIR = $(PROJECT_DIR)/resources/pkcs12/certificado_teste_hub.pfx
+P12_PASSWORD ?= bry123456
 P7S_FILE = $(PROJECT_DIR)/signature.p7s
 
 .PHONY: setup build run_challenge_one run_challenge_two run_challenge_tree run_api run_tests clean

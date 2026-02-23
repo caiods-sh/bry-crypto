@@ -40,6 +40,32 @@ std::string Hash::GenerateSHA512FromFile(const std::string& filePath) {
     return toHex(hash);
 }
 
+std::string Hash::GenerateSHA512FromBuffer(const unsigned char* data, size_t length) {
+    EVP_MD_CTX* context = EVP_MD_CTX_new();
+    if (!context) throw std::runtime_error("Error creating OpenSSL context!");
+
+    if (EVP_DigestInit_ex(context, EVP_sha512(), nullptr) != 1) {
+        EVP_MD_CTX_free(context);
+        throw std::runtime_error("Error in DigestInit");
+    }
+
+    if (EVP_DigestUpdate(context, data, length) != 1) {
+        EVP_MD_CTX_free(context);
+        throw std::runtime_error("Error in DigestUpdate");
+    }
+
+    std::vector<uint8_t> hash(EVP_MAX_MD_SIZE);
+    unsigned int hashLength = 0;
+    if (EVP_DigestFinal_ex(context, hash.data(), &hashLength) != 1) {
+        EVP_MD_CTX_free(context);
+        throw std::runtime_error("Error in DigestFinal");
+    }
+
+    EVP_MD_CTX_free(context);
+    hash.resize(hashLength);
+    return toHex(hash);
+}
+
 std::string Hash::toHex(const std::vector<uint8_t>& data) {
     std::stringstream ss;
     ss << std::hex << std::setfill('0');
