@@ -1,11 +1,12 @@
-DOC_DIR=/home/vboxuser/softwares/bry/resources/arquivos/doc.txt
-P12_FILE_DIR=/home/vboxuser/softwares/bry/resources/pkcs12/cert_unit_test.pfx
-# P12_PASSWORD=bry123456
-P12_PASSWORD=devc++
+PROJECT_DIR ?= /home/vboxuser/softwares/bry# Alterar para diretório que o projeto foi clonado
+BUILD_DIR = $(PROJECT_DIR)/build/build/Release
 
-P7S_FILE=/home/vboxuser/softwares/bry/signature.p7s
+DOC_DIR ?= $(PROJECT_DIR)/resources/arquivos/doc.txt
+P12_FILE_DIR = $(PROJECT_DIR)/resources/pkcs12/cert_unit_test.pfx
+P12_PASSWORD ?= devc++
+P7S_FILE = $(PROJECT_DIR)/signature.p7s
 
-.PHONY: setup build run_challenge_one run_tests clean
+.PHONY: setup build run_challenge_one run_challenge_two run_challenge_tree run_api run_tests clean
 
 setup:
 	conan install . --output-folder=build --build=missing
@@ -14,20 +15,26 @@ setup:
 build: setup
 	cmake --build --preset conan-release
 
+build_docker_image:
+	docker build -t bry-challenge .
+
+run_docker_api:
+	docker run -p 8080:8080 bry-challenge
+
 run_challenge_one:
-	./build/build/Release/src/bry_challenge_one $(DOC_DIR)
+	$(BUILD_DIR)/src/bry_challenge_one $(DOC_DIR)
 
 run_challenge_two:
-	./build/build/Release/src/bry_challenge_two $(DOC_DIR) $(P12_FILE_DIR) $(P12_PASSWORD)
+	$(BUILD_DIR)/src/bry_challenge_two $(DOC_DIR) $(P12_FILE_DIR) $(P12_PASSWORD)
 
 run_challenge_tree:
-	./build/build/Release/src/bry_challenge_tree $(P7S_FILE)
+	$(BUILD_DIR)/src/bry_challenge_tree $(P7S_FILE)
 
 run_api:
-	./build/build/Release/src/bry_api
+	$(BUILD_DIR)/src/bry_api
 
 run_tests: build
-	cd ./build/build/Release/tests && ctest --output-on-failure
+	cd $(BUILD_DIR)/tests && ctest --output-on-failure
 
 clean:
 	rm -rf build/ CMakeUserPresets.json signature.p7s

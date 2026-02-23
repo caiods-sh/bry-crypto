@@ -103,15 +103,6 @@ void SignatureHandler::handleRequest(
         MultiPartHandler partHandler;
         Poco::Net::HTMLForm form(request, request.stream(), partHandler);
 
-        std::cerr << "[DEBUG] Form fields received:" << std::endl;
-        for (const auto& [key, value] : form) {
-            std::cerr << "  field: '" << key << "' = '" << value << "'" << std::endl;
-        }
-        std::cerr << "[DEBUG] Files received:" << std::endl;
-        for (const auto& [key, value] : partHandler.files) {
-            std::cerr << "  file: '" << key << "' size=" << value.size() << " bytes" << std::endl;
-        }
-
         if (partHandler.files.find("file") == partHandler.files.end()) {
             sendError(response, 400, "Missing field: 'file' (document to sign)");
             return;
