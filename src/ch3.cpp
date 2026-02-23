@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
         std::cout << "--- Verification Result ---" << std::endl;
         std::cout << "Is Valid: " << (res.isValid ? "YES" : "NO") << std::endl;
         std::cout << "Signer:   " << res.signerCommonName << std::endl;
+        std::cout << "hashHex:   " << res.hashHex << std::endl;
         std::cout << "Hash Alg: " << res.hashAlgorithm << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

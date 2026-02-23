@@ -1,8 +1,8 @@
 # Teste técnico Bry
 
-## Comandos úteis
+## Comandos
 
-### Gerar certificados para testes
+### Gerar certificados para fins de teste.
 ```bash
 # Cria certificado key.pem e cert.pem
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha512 -days 365 -nodes

@@ -44,3 +44,19 @@ target_link_libraries(
         OpenSSL::Crypto
         crypto_lib
 )
+
+
+add_executable(bry_api 
+    api/SignatureHandler.cpp 
+    api/VerifyHandler.cpp 
+    api/RestServer.cpp
+)
+
+target_link_libraries(bry_api 
+    PRIVATE 
+        crypto_lib 
+        Poco::Net 
+        Poco::Util 
+        Poco::Foundation
+        OpenSSL::Crypto
+)

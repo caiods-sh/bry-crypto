@@ -23,6 +23,9 @@ run_challenge_two:
 run_challenge_tree:
 	./build/build/Release/src/bry_challenge_tree $(P7S_FILE)
 
+run_api:
+	./build/build/Release/src/bry_api
+
 run_tests: build
 	cd ./build/build/Release/tests && ctest --output-on-failure
 
