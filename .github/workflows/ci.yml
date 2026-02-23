@@ -1,0 +1,86 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: bry-challenge:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: bry-challenge:release
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Extract binaries from Docker image
+        run: |
+          mkdir -p release_artifacts
+          docker create --name temp_container bry-challenge:release
+          docker cp temp_container:/app/bry_api              release_artifacts/bry_api
+          docker cp temp_container:/app/bry_challenge_one    release_artifacts/bry_challenge_one
+          docker cp temp_container:/app/bry_challenge_two    release_artifacts/bry_challenge_two
+          docker cp temp_container:/app/bry_challenge_tree   release_artifacts/bry_challenge_tree
+          docker rm temp_container
+
+      - name: Package binaries as tar.gz
+        run: |
+          tar -czvf bry_challenge_linux_x64.tar.gz -C release_artifacts .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            bry_challenge_linux_x64.tar.gz
+            release_artifacts/bry_api
+            release_artifacts/bry_challenge_one
+            release_artifacts/bry_challenge_two
+            release_artifacts/bry_challenge_tree
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
