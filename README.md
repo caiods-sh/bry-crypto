@@ -57,7 +57,3 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha512 -days 3
 # Empacota certificado e chave privada (cert_unit_test.pfx)
 openssl pkcs12 -export -out cert_unit_test.pfx -inkey key.pem -in cert.pem
 ```
-
-### Docker
-docker build -t bry-challenge .
-docker run -p 8080:8080 bry-challenge
